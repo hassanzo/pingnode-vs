@@ -1,4 +1,5 @@
 #!/bin/sh
+# MORE
 # Global Variables
 available=true
 unavailable=
