@@ -1,0 +1,92 @@
+#!/bin/sh
+# Global Variables
+available=true
+unavailable=
+
+tstamp=$(date +%H:%M:%S)
+
+targetip=$1
+delim="--------------------------------------------------"
+
+# Functions
+spinnerfn()
+{
+# Function specific Variables
+	i=1
+	sp="/-\|"
+
+	printf "\b${sp:i++%${#sp}:1}";
+	sleep 0.5;
+}
+
+online_notifier()
+{
+	terminal-notifier -message "LOG: `date +%H:%M:%S` - Node is online: $targetip" $2>/dev/null	
+}
+
+offline_notifier()
+{
+	terminal-notifier -message "LOG: `date +%H:%M:%S` - Node is offline: $targetip" $2>/dev/null	
+}
+
+
+
+clear
+printf "\e[33m##	ICMP probe initiated	##"
+echo "\033[0m"
+echo $delim
+
+	while true
+	do
+	if $available 
+		then
+		echo "Node up, waiting for change...  \c"
+	while ping -c 1 -t 2 $targetip $2>/dev/null
+	do
+	spinnerfn
+done
+
+echo ""
+printf "\e[31mLOG: `date +%H:%M:%S` - Node ($targetip) is offline"
+echo "\033[0m"
+echo $delim
+offline_notifier
+say "pong!"  
+available=false
+
+else
+sleep 0.5
+
+
+# Try to ping the node untill it comes back and then notify me
+
+while !(ping -c 1 -t 1 $targetip $2>/dev/null) 
+  	do
+#  		echo $delim 
+		available=false
+		unavailable=true   	
+   		sleep 1
+if $unavailable
+	then
+	#echo $i
+	#echo $sp
+	echo "LOG: `date +%H:%M:%S` - Retrying ($targetip).... \c"
+
+	while !(ping -c 1 -t 2 $targetip $2>/dev/null)
+	do
+	spinnerfn
+	done
+fi   		
+done
+echo ""
+	printf "\e[32mLOG: `date +%H:%M:%S` - Node ($targetip) is available. "
+		echo "\033[0m"
+		echo $delim
+online_notifier
+		say "ping!"  
+		unavailable=false
+		available=true
+fi
+
+
+done
