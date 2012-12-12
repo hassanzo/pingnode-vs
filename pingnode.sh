@@ -1,5 +1,4 @@
 #!/bin/sh
-# MORE2fff
 # Global Variables
 available=true
 unavailable=
@@ -13,11 +12,12 @@ delim="--------------------------------------------------"
 spinnerfn()
 {
 # Function specific Variables
-	i=1
-	sp="/-\|"
 
-	printf "\b${sp:i++%${#sp}:1}";
-	sleep 0.5;
+i=1
+sp="/-\|"
+    printf "\b${sp:i++%${#sp}:1}"
+    sleep 0.05
+
 }
 
 online_notifier()
@@ -41,7 +41,7 @@ echo $delim
 	do
 	if $available 
 		then
-		echo "Node up, waiting for change...  \c"
+		echo "INFO: Link up, waiting for change...  \c"
 	while ping -c 1 -t 2 $targetip $2>/dev/null
 	do
 	spinnerfn
@@ -71,7 +71,7 @@ if $unavailable
 	then
 	#echo $i
 	#echo $sp
-	echo "LOG: `date +%H:%M:%S` - Retrying ($targetip).... \c"
+	echo "WARNING: Link down. Retrying... \c"
 
 	while !(ping -c 1 -t 2 $targetip $2>/dev/null)
 	do
